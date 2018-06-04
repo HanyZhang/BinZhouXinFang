@@ -1,0 +1,126 @@
+﻿@model IEnumerable<PetitionLetter.Dll.Model.PetitionStatistics>
+@{
+    ViewBag.Title = "来市、到省、进京走访统计表" + "(" + ViewBag.DateString + ")";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SubTitle = "累计" + ViewBag.Total_Qi + "起" + ViewBag.ToTal_Ren + "人";
+}
+<style>
+    td {
+        text-align: center;
+    }
+</style>
+<script type="text/javascript">
+    function doSearch() {
+        var startTime = $('#StartTime').datebox('getValue');
+        var endTime = $('#EndTime').datebox('getValue');
+        window.location.href = "/Petition/Statistics?StartTime=" + startTime + "&EndTime=" + endTime;
+        //$.get('/Petition/Statistics', { StartTime: startTime, EndTime: endTime });
+        //$.post('/Petition/Statistics', { StartTime: startTime, EndTime: endTime }, function (r) {
+        //    if (r) {
+                
+        //    }
+        //})
+    }
+</script>
+<div class="easyui-panel" style="width:100%;height:100%;padding:10px;overflow:auto">
+    <div style="padding:5px;display:flex;margin-bottom:20px">
+        <p style="margin:5px">开始日期:</p>
+        <input class="easyui-datebox" id="StartTime" data-options="sharedCalendar:'#cc'">
+        <div style="width:20px"></div>
+        <p style="margin:5px">结束日期:</p>
+        <input class="easyui-datebox" id="EndTime" data-options="sharedCalendar:'#cc'">
+        <a onclick="doSearch()" class="easyui-linkbutton" href="javascript:void(0)" iconCls="icon-search" style="margin-left:20px">查询</a>
+    </div>
+    <table border="1" cellspacing="0" style="width:80%; height:600px;font-size:16px" align="center">
+        <tr>
+            <th colspan="9" style="font-size:25px;text-align:center;height:80px">@ViewBag.Title</th>
+        </tr>
+        <tr>
+            <td colspan="9" style="text-align:right;padding-right:20px">@ViewBag.SubTitle</td>
+        </tr>
+        <tr>
+            <td rowspan="2">县区</td>
+            <td colspan="2">非访</td>
+            <td colspan="2">进京访</td>
+            <td colspan="2">到省访</td>
+            <td colspan="2">来市访</td>
+        </tr>
+        <tr>
+            <td>起数</td>
+            <td>人数</td>
+            <td>起数</td>
+            <td>人数</td>
+            <td>起数</td>
+            <td>人数</td>
+            <td>起数</td>
+            <td>人数</td>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.CountyName</td>
+                @if (item.NoVisit_Qi == 0) {
+                    <td> </td>
+                }
+                else {
+                    <td>@item.NoVisit_Qi</td>
+                }
+
+                @if (item.NoVisit_Ren == 0) {
+                    <td> </td>
+                }
+                else {
+                    <td>@item.NoVisit_Ren</td>
+                }
+
+                @if (item.Capital_Qi == 0) {
+                    <td></td>
+                }
+                else {
+                    <td>@item.Capital_Qi </td>
+                }
+
+                @if (item.Capital_Ren == 0) {
+                    <td></td>
+                }
+                else {
+                    <td>@item.Capital_Ren</td>
+                }
+
+                @if (item.Province_Qi == 0) {
+                    <td></td>
+                }
+                else {
+                    <td>@item.Province_Qi</td>
+                }
+
+                @if (item.Province_Ren == 0) {
+                    <td></td>
+                }
+                else {
+                    <td>@item.Province_Ren</td>
+                }
+                
+                @if (item.City_Qi == 0) {
+                    <td></td>
+                }
+                else {
+                    <td>@item.City_Qi</td>
+                }
+
+                @if (item.City_Ren == 0) {
+                    <td></td>
+                }
+                else {
+                    <td>@item.City_Ren</td>
+                }                
+            </tr>
+        }
+        <tr>
+            <td colspan="9" style="text-align:left;padding-left:20px">备注：周六周日国家信访局不登记访。</td>
+        </tr>
+    </table>
+    <div id="cc" class="easyui-calendar"></div>
+</div>
+
+

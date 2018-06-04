@@ -1,0 +1,75 @@
+﻿
+@{
+    ViewBag.Title = ViewBag.AppName;
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="~/EasyUI/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="~/EasyUI/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css" href="~/EasyUI/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="~/EasyUI/themes/icon.css">
+    <script type="text/javascript" src="~/Scripts/md5.js"></script>
+    <link href="~/Content/login.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript">
+        function login() {
+            var username = $("#username").val();
+            var password = $("#password").val();
+            if (username == null || username.length == 0) {
+                $.messager.alert('提示', '请输入用户名');
+                return;
+            }
+            if (password == null || password.length == 0) {
+                $.messager.alert('提示', '请输入密码');
+                return;
+            }
+            password = hex_md5(password);
+            var url = "/Home/Login";
+            $.post(url, { username: username, password: password }, function (r) {
+                if (r == null) return;
+                if (r.success) {
+                    window.location.href = "/Home/Index";
+                } else {
+                    $.messager.alert('提示', r.message);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="title">
+        <img src="~/Image/xinfang.png">
+    </div>
+    <div class="main-login">
+        <div class="login-content">
+            <h2>用户登录</h2>
+            <form action="" method="post" id="login-form" name="login-form">
+                <div class="login-info">
+                    <span class="user">&nbsp;</span>
+                    <input name="username" id="username" type="text" value="" class="login-input" />
+                </div>
+                <div class="login-info">
+                    <span class="pwd">&nbsp;</span>
+                    <input name="password" id="password" type="password" value="" class="login-input" />
+                </div>
+                <div style="height:30px">
+                </div>
+                <div class="login-oper">
+                    <input name="" type="button" value="登 录" onclick="login()" class="login-btn" />
+                    <input name="" type="submit" value="重 置" class="login-reset" />
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+</body>
+</html>
+

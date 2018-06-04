@@ -1,0 +1,101 @@
+﻿
+@{
+    ViewBag.Title = "发布通知";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript" charset="utf-8" src="~/UEditor/ueditor.config.js"></script>
+<script type="text/javascript" charset="utf-8" src="~/UEditor/ueditor.all.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="~/UEditor/lang/zh-cn/zh-cn.js"></script>
+<style type="text/css">
+    marquee {
+        font-size: 14px;
+        color: crimson;
+    }
+</style>
+<script type="text/javascript">
+    var ue = UE.getEditor('content', {
+        elementPathEnabled: false,
+        toolbars: [
+            ['fullscreen', 'undo', 'redo'],
+            ['bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc']
+        ]
+    });
+
+    function send() {
+        var title = $("#title").val();
+        var content = UE.getEditor('content').getContent();
+        var hasContents = UE.getEditor('content').hasContents();
+        //var content = $("#content").val();
+        if (title == null || title.length == 0) {
+            $.messager.alert("提示", "请输入通知标题");
+            return;
+        }
+        if (!hasContents) {
+            $.messager.alert("提示", "请输入通知内容");
+            return;
+        }
+        $.messager.confirm("提示", "您确定要给您的所有直属下级信访局发送通知吗？", function (r) {
+            if (r) {
+                //$.messager.alert('提示', content);
+                $.post("/Notice/ReleasePost", { title: title, content: content }, function (r) {
+                    if (r == null) return;
+                    if (r.success) {
+                        $.messager.alert("提示", "发布成功", "info", function () {
+                            $('#release').hide();
+                            $('#title_success').html(title);
+                            $('#content_success').html(content);
+                            $('#success').show();
+                        });
+                    } else {
+                        $.messager.alert("提示", r.message);
+                    }
+                });
+            }
+        });
+    }
+</script>
+
+<div class="easyui-panel" style="width:100%;height:100%">
+    <div id="release">
+        <marquee direction="left">温馨提示：该通知将发布给所有下级直属信访部门，他们可以在手机App上收到通知。</marquee>
+        <table id="td" cellpadding="5">
+            <tr style="width:800px">
+                <td>标题:</td>
+                <td><input style="width: 700px" class="easyui-textbox" type="text" name="title" id="title" /></td>
+            </tr>
+            <tr>
+                <td>正文:</td>
+                <td>
+                    <script id="content" name="content" type="text/plain" style="width:700px;height:300px"></script>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td>
+                    <a href="#" class="easyui-linkbutton" style="width:20%;" onclick="send()">发布</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="success" hidden="hidden">
+        <table cellpadding="5">
+            <tr>
+                <td>您的通知已发布成功!</td>
+                <td></td>
+            </tr>
+            <tr style="width:800px">
+                <td>标题:</td>
+                <td>
+                    <div id="title_success"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>正文:</td>
+                <td>
+                    <div id="content_success"></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

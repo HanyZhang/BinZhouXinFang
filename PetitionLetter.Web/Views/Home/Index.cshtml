@@ -1,0 +1,306 @@
+﻿@{
+    ViewBag.Title = ViewBag.AppName;
+}
+<style type="text/css">
+    #tabs .tabs-panels > .panel > .panel-body {
+        overflow: hidden;
+    }
+
+    div #westMenu li {
+        padding-top: 10px;
+    }
+
+    .tree-title {
+        font-size: 1.2em;
+    }
+
+        .tree-title a {
+            text-decoration: none;
+        }
+
+    div #westMenu li a:link {
+        font-size: 14px;
+        color: #000000;
+        text-decoration: none;
+    }
+
+    div #westMenu li a:visited {
+        font-size: 14px;
+        color: #000000;
+        text-decoration: none;
+    }
+
+    div #westMenu li a:hover {
+        font-size: 14px;
+        color: #999999;
+        text-decoration: underline;
+    }
+</style>
+<script type="text/javascript" src="~/Scripts/md5.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#westMenu a").click(function () {
+            var rel = $(this).attr("rel");
+            var title = $(this).text();
+            var url = $(this).attr("rel");
+            var icon = $(this).attr("iconCls");
+            if (url) {
+                openTab(title, url, icon);
+                return false;    //使超链接的单击事件失效
+            }
+        });
+        openTab('填写日报', '/Petition/DailyIndex', 'icon-add');
+    });
+    /**
+    如果这个标题的标签存在，则选择该标签
+    否则添加一个标签到标签组
+    */
+    function openTab(title, url, icon) {
+        if ($("#tabs").tabs('exists', title)) {
+            // $("#tabs").tabs('select', title);
+            var currTab =  self.parent.$('#tabs').tabs('getSelected'); //获得当前tab
+            self.parent.$('#tabs').tabs('update', {
+                tab : currTab,
+                options : {
+                    title: title,
+                    content : createTabContent(url),
+                    closable: true,
+                    iconCls: icon
+                }
+            });
+        } else {
+            $("#tabs").tabs('add', {
+                title: title,
+                content: createTabContent(url),
+                closable: true,
+                iconCls: icon
+            });
+        }
+    }
+
+    /* 生成标签内容 */
+    function createTabContent(url) {
+        return '<iframe style="width:100%;height:100%;overflow:hidden;" frameborder="0" src="' + url + '"></iframe>';
+    }
+
+    /**ajax 全局配置**/
+    $.ajaxSetup({
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+            if (XMLHttpRequest.status == 403) {
+                $.messager.alert('提示','您没有权限访问此资源或进行此操作','warning');
+                return false;
+            }
+        },
+        complete: function (XMLHttpRequest, textStatus) {
+            var sessionstatus = XMLHttpRequest.getResponseHeader("sessionstatus"); //通过XMLHttpRequest取得响应头,sessionstatus，
+            if (sessionstatus == 'timeout') {
+                var top = getTopWinow(); //获取当前页面的顶层窗口对象
+                $.messager.alert('提示','登录超时, 请重新登录','warning',function () {
+                    //如果超时就处理 ，指定要跳转的页面
+                    top.location.href = "/Home/Login"; //跳转到登陆页面
+                });
+            }
+        }
+    });
+
+    /**
+    * 在页面中任何嵌套层次的窗口中获取顶层窗口
+    * return 当前页面的顶层窗口对象
+    */
+    function getTopWinow() {
+        var p = window;
+        while (p != p.parent) {
+            p = p.parent;
+        }
+        return p;
+    }
+
+    function editPassword() {
+        //$("#editPasswordDiv").css("display", "block");
+        $("#dlg").dialog("open").dialog('setTitle', '修改密码');
+        $("#fm").form('clear');
+    }
+
+    function saveUser() {
+        var oldPwd = $("#oldPwd").val();
+        var newPwd = $("#newPwd").val();
+        var againPwd = $("#againPwd").val();
+        if (oldPwd == newPwd) {
+            $.messager.alert('提示', '新密码不能和旧密码相同!', 'error');
+            return;
+        }
+        if (newPwd != againPwd) {
+            $.messager.alert("提示", "两次密码输入的不一致，请重新输入", "error");
+            return;
+        }
+        var url = "/Management/ChangePassword?foo=" + Math.random();
+        $.post(url, { oldPwd: hex_md5(oldPwd), newPwd: hex_md5(newPwd) }, function (r) {
+            if (r.success) {
+                $.messager.alert('提示', '修改成功!', 'info', function (r) {
+                    $('#dlg').dialog("close");
+                });
+            } else {
+                $.messager.alert('提示', r.message);
+            }
+        })
+    }
+
+    function logOut() {
+        $.messager.confirm('提示', '您确定要退出登录吗？', function (r) {
+            if (r) {
+                top.location.href = '/Home/Login';
+            }
+        })
+    }
+</script>
+
+<div region="north" split="true" style="height:100px;overflow:hidden;background: url('../../Image/head_bg.jpg')">
+    <div style="padding-left:40px; margin-top:20px; line-height: 40px; color:white; font-size:30px; font-weight:bold">@ViewBag.AppName</div>
+    <div style="display:flex;float:right;margin-right:30px;">
+        <div style="color:white;font-weight:bold;">
+            当前用户：@ViewBag.Username
+        </div>
+        <a href="javascript:void(0)" style="margin-left:20px;text-decoration:none" onclick="logOut()">退出登录</a>
+    </div>
+</div>
+
+<div region="west" title="菜单" split="true" style="width: 200px;padding-bottom: 50px;">
+    <div id="westMenu">
+        <ul class="easyui-tree" data-options="animate:true">
+            <li>
+                <span>信访工作通知</span>
+                <ul>
+                    <li iconCls="icon-add">
+                        <a href="javascript:void(0);" iconCls="icon-add" rel="/Notice/Release">发布通知</a>
+                    </li>
+                    <li iconCls="icon-print">
+                        <a href="javascript:void(0);" iconCls="icon-print" rel="/Notice/ReceivedIndex">我收到的通知</a>
+                    </li>
+                    <li iconCls="icon-edit">
+                        <a href="javascript:void(0);" iconCls="icon-edit" rel="/Notice/ReleasedIndex">我发布的通知</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <span>每日信访</span>
+                <ul>
+                    <li iconCls="icon-add">
+                        <a href="javascript:void(0);" iconCls="icon-add" rel="/Petition/DailyIndex">填写日报</a>
+                    </li>
+                    @if(ViewBag.Level == 2)
+                    {
+                        <li iconCls="icon-print">
+                            <a href="javascript:void(0);" iconCls="icon-print" rel="/Petition/Statistics">统计表</a>
+                        </li>
+                    }
+                </ul>
+            </li>
+            <li>
+                <span>信访工作信息预警</span>
+                <ul>
+                    <li iconCls="icon-search">
+                        <a href="javascript:void(0);" iconCls="icon-search" rel="/Warning/Index">查看预警信息</a>
+                    </li>
+                </ul>
+            </li>
+            @*<li>
+                <span>信访案件处理</span>
+                <ul>
+                    <li iconCls="icon-tip">
+                        <a href="javascript:void(0);" iconCls="icon-tip" rel="">待处理案件</a>
+                    </li>
+                    <li iconCls="icon-ok">
+                        <a href="javascript:void(0);" iconCls="icon-ok" rel="">已处理案件</a>
+                    </li>
+                </ul>
+            </li>*@
+            <li>
+                <span>工作台账</span>
+                <ul>
+                    <li iconCls="icon-print">
+                        <a href="javascript:void(0);" iconCls="icon-print" rel="/Petition/Index">台账列表</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <span>统计分析</span>
+                <ul>
+                    <li iconCls="icon-search">
+                        <a href="javascript:void(0); iconCls=icon-search" rel="/Statistics/Map">地图统计</a>
+                    </li>
+                    <li iconCls="icon-large-chart">
+                        <a href="javascript:void(0); iconCls=icon-large-chart" rel="/Statistics/BarGraph">柱状图</a>
+                    </li>
+                    <li iconCls="icon-large-shapes">
+                        <a href="javascript:void(0); iconCls=icon-large-shapes" rel="/Statistics/PieChart">饼状图</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <span>督导考核</span>
+                <ul>
+                    <li iconCls="icon-search">
+                        <a href="javascript:void(0); iconCls=icon-search" rel="">查看报表</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <span>系统管理</span>
+                <ul>
+                    @*<li iconCls="icon-tip">
+                        <a href="javascript:void(0); iconCls=icon-tip" rel="/Management/Map">维护地图区划</a>
+                    </li>*@
+                    <li iconCls="icon-tip">
+                        <a href="javascript:void(0); iconCls=icon-tip" onclick="editPassword()">修改密码</a>
+                    </li>
+                    <li iconCls="icon-tip">
+                        <a href="javascript:void(0); iconCls=icon-tip" rel="/Management/UserIndex">用户管理</a>
+                    </li>
+                    <li iconCls="icon-tip">
+                        <a href="javascript:void(0); iconCls=icon-tip" rel="/Management/CategoryIndex">类别维护</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="easyui-dialog" id="dlg" closed="true" title="修改密码" style="width:350px;height:220px;padding:20px 50px" buttons="#dlg-buttons">
+    <form id="fm" method="post" novalidate>
+        <table>
+            <tr>
+                <td>原密码:</td>
+                <td><input id="oldPwd" name="oldPwd" type="password" class="easyui-textbox" data-options="required:true" /></td>
+            </tr>
+            <tr>
+                <td>新密码:</td>
+                <td><input id="newPwd" name="newPwd" type="password" class="easyui-textbox" data-options="required:true" /></td>
+            </tr>
+            <tr>
+                <td>新密码:</td>
+                <td>
+                    <input id="againPwd" name="againPwd" type="password" class="easyui-textbox"
+                           data-options="required:true" />
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+<div id="dlg-buttons" style="text-align: right">
+    <a href="javascript:void(0);" class="easyui-linkbutton c6" iconcls="icon-ok" onclick="saveUser()">确定</a>
+    <a href="javascript:void(0);" class="easyui-linkbutton" iconcls="icon-cancel" onclick="$('#dlg').dialog('close')">取消</a>
+</div>
+<div region="center" style="padding-bottom:50px">
+    <div id="tabs" class="easyui-tabs" border="false" fit="true">
+        <div title="欢迎使用" closable="true">
+            <div style="float:right;margin-right:50px;margin-top:30px;display:none;">
+                这里是待办事项
+                <ul>
+                    <li>事项一</li>
+                    <li>事项一</li>
+                    <li>事项一</li>
+                    <li>事项一</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

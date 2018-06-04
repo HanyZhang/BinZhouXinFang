@@ -1,0 +1,144 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+        body, html, #allmap {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            margin: 0;
+            font-family: "微软雅黑";
+        }
+    </style>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=AEA2vhIN0R1sbbRYBOeXnHiap3Z1iYcG"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="~/EasyUI/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="~/EasyUI/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css" href="~/EasyUI/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="~/EasyUI/themes/icon.css">
+    <title>地图查看</title>
+</head>
+<body>
+    <div id="allmap"></div>
+</body>
+</html>
+<script type="text/javascript">
+    // 百度地图API功能
+    var map = new BMap.Map("allmap");
+    var overlays = [];
+    map.centerAndZoom("滨州市", 12);
+    map.enableScrollWheelZoom(); //启用鼠标滚动对地图放大缩小
+    
+    function getBoundary(county, content) {
+        var bdary = new BMap.Boundary();
+        bdary.get("滨州市" + county, function (rs) {       //获取行政区域
+            map.clearOverlays();        //清除地图覆盖物       
+            var count = rs.boundaries.length; //行政区域的点有多少个
+            if (count === 0) {
+                alert('未能获取当前输入行政区域');
+                return;
+            }
+            var pointArray = [];
+            for (var i = 0; i < count; i++) {
+                var ply = new BMap.Polygon(rs.boundaries[i], { strokeWeight: 2, strokeColor: "#ff0000" }); //建立多边形覆盖物
+                map.addOverlay(ply);  //添加覆盖物
+                pointArray = pointArray.concat(ply.getPath());
+            }
+            map.setViewport(pointArray);    //调整视野
+            //添加marker
+            var myGeo = new BMap.Geocoder();
+            myGeo.getPoint(county, function (point) {
+                if (point) {
+                    addMarker(point, county, content);
+                } else {
+                    alert("您选择地址没有解析到结果!");
+                }
+            }, "滨州市");
+        });
+    }
+
+    function SearchControl() {
+        this.defaultAnchor = BMAP_ANCHOR_TOP_LEFT;
+        this.defaultOffset = new BMap.Size(10, 10);
+    }
+
+    SearchControl.prototype = new BMap.Control();
+    SearchControl.prototype.initialize = function (map) {
+        var div = document.createElement("div");
+        $(div).css({
+            width: "400px",
+            display: "flex"
+        });
+        $(div).html("<div style= 'width:50%;display:flex;margin-top:10px;'><p style='margin-top:7px;font-size:14px'>县区：</p><input id='county' class='easyui-combobox' style='height:30px;width:130px' data-options=\"valueField:'Id',textField:'Name',url:'/Management/GetCountyList',prompt:'请选择'\"></div><div style='width:50%;display:flex;margin-top:10px'><p style='margin-top:7px;font-size:14px'>乡镇：</p><input id='town' class='easyui-combobox' style='height:30px;width:130px' data-options=\"valueField:'Id',textField:'Name',prompt:'请选择'\"></div></div>");
+        map.getContainer().appendChild(div);
+        return div;
+    }
+
+    var searchCtrl = new SearchControl();
+    map.addControl(searchCtrl);
+
+    $('#county').combobox({
+        onSelect: function (rec) {
+            $('#town').combobox('clear');
+            $('#town').combobox('reload', '/Management/GetTown?county=' + rec.Id);
+            $.post("/Statistics/getCount?countyId=" + rec.Id, function (r) {
+                if (r.success) {
+                    getBoundary(rec.Name, r.data);
+                } else {
+                    $.messager.alert('提示', r.message);
+                }
+            })
+        }
+    });
+    
+    $('#town').combobox({
+        onSelect: function (rec) {
+            clearMarker();           
+            var county = $('#county').combobox('getText');
+            var myGeo = new BMap.Geocoder();
+            myGeo.getPoint(county + rec.Name, function (point) {
+                if (point) {
+                    $.post("/Statistics/getCount?countyId=" + rec.Id, function (r) {
+                        if (r.success) {
+                            addMarker(point, county + rec.Name, r.data);
+                        } else {
+                            $.messager.alert('提示', r.message);
+                        }
+                    })                    
+                } else {
+                    $.messager.alert("提示", "您选择地址没有解析到结果!");
+                }
+            }, "滨州市");
+        }
+    })
+
+    function addMarker(point, title, content) {
+        map.centerAndZoom(point, 12);
+        var marker = new BMap.Marker(point);  // 创建标注
+        map.addOverlay(marker);               // 将标注添加到地图中
+        marker.addEventListener("click", function () {
+            var sContent =
+                "<h5 style='margin:0 0 5px 0;padding:0.2em 0'>" + title + "</h5>" +
+                "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>" + "共计" + content + "件" + "</p>" +
+                "</div>";
+            var infoWindow = new BMap.InfoWindow(sContent);  // 创建信息窗口对象
+            this.openInfoWindow(infoWindow); //开启信息窗口
+        });
+        overlays.push(marker);
+    }
+
+    function clearMarker() {
+        for (var i = 0; i < overlays.length; i++) {
+            map.removeOverlay(overlays[i]);
+        }
+        overlays.length = 0;
+    }
+</script>

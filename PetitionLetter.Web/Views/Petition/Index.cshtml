@@ -1,0 +1,71 @@
+﻿
+@{
+    ViewBag.Title = "工作台帐";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    $(function () {
+        $('#dg').datagrid({
+            url: '/Petition/getList',
+            onLoadSuccess: function (data) {
+                if (data.total < 1) {
+                    var body = $(this).data().datagrid.dc.body2;
+                    body.find('table tbody').append('<tr><td width="' + body.width() + '" style="height: 25px; text-align: center;" colspan="9" ><font color="gray" size="2">暂无记录！</font></td></tr>');
+                }
+            }
+        })
+    });
+
+    function doSearch() {
+        $('#dg').datagrid({
+            url: '/Petition/getList',
+            queryParams: {
+                StartTime: $('#StartTime').datebox('getValue'),
+                EndTime: $('#EndTime').datebox('getValue'),
+                ProblemAddress: $('#ProblemAddress').combobox('getValue'),
+                CategoryId: $('#CategoryId').combobox('getValue')
+            },
+            onLoadSuccess: function (data) {
+                if (data.total < 1) {
+                    var body = $(this).data().datagrid.dc.body2;
+                    body.find('table tbody').append('<tr><td width="' + body.width() + '" style="height: 25px; text-align: center;" colspan="9" ><font color="gray" size="2">暂无记录！</font></td></tr>');
+                }
+            }
+        })
+    }
+</script>
+
+<div class="easyui-panel" title="工作台账" style="width:100%;height:100%;padding:10px;">
+    <table class="easyui-datagrid" id="dg" style="width:99%;height:100%" pagination="true"
+           rownumbers="true" singleSelect="true" toolbar="#toolbar">
+        <thead>
+            <tr>
+                <th width="100px" data-options="field:'DateString', align:'center'">信访日期</th>
+                <th width="100px" data-options="field:'Name', align:'center'">姓名</th>
+                <th width="100px" data-options="field:'Phone', align:'center'">联系电话</th>
+                <th width="150px" data-options="field:'Certificate', align:'center'">证件号码</th>
+                <th width="200px" data-options="field:'Address', align:'center'">地址</th>
+                <th width="100px" data-options="field:'ProblemAddress', align:'center'">问题属地</th>
+                <th width="50px" data-options="field:'Count', align:'center'">人数</th>
+                <th width="250px" data-options="field:'Survey', align:'center'">概况</th>
+                <th width="150px" data-options="field:'Remark', align:'center'">备注</th>
+            </tr>
+        </thead>
+    </table>
+    <div id="toolbar" style="padding:5px;height:auto">
+        <div style="margin-bottom:5px;display:flex;height:25px">
+            <p style="margin:5px">开始日期:</p>
+            <input class="easyui-datebox" id="StartTime" data-options="sharedCalendar:'#cc'">
+            <p style="margin:5px">结束日期:</p>
+            <input class="easyui-datebox" id="EndTime" data-options="sharedCalendar:'#cc'">
+            <p style="margin:5px">地区:</p>
+            <input class="easyui-combobox" id="ProblemAddress" data-options="valueField:'Id',textField:'Name',url:'/Management/GetCountyList',prompt:'请选择'"/>
+            <p style="margin:5px">类别:</p>
+            <input class="easyui-combobox" id="CategoryId" data-options="valueField:'Id',textField:'Name',url:'/Management/GetCategoryList',prompt:'请选择'"/>
+            <a onclick="doSearch()" class="easyui-linkbutton" href="javascript:void(0)" iconCls="icon-search" style="margin-left:20px">查询</a>
+        </div>
+    </div>
+    <div id="cc" class="easyui-calendar"></div>
+</div>
+
+

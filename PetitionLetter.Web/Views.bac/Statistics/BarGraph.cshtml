@@ -1,0 +1,119 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>柱状图</title>
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="~/EasyUI/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="~/EasyUI/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css" href="~/EasyUI/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="~/EasyUI/themes/icon.css">
+    <script type="text/javascript" src="~/ECharts/echarts.min.js"></script>
+</head>
+<body>
+    <div class="easyui-panel" style="width:100%;height:100%;padding:10px">
+        <div style="display:flex;">
+            <p style="font-size:14px;margin-top:7px">年份：</p>
+            <input id="cc" class="easyui-combobox" name="dept" style="height:30px"
+                   data-options="valueField:'Id',textField:'Name',url:'/Statistics/getYear',
+                   onLoadSuccess:function(data){ $('#cc').combobox('setValue',data[0].Id);}">
+        </div>
+        <div id="chartmain" style="width:600px; height: 400px; margin-top:10px"></div>
+        <div id="chart" style="width:600px; height:400px; margin-top:10px"></div>
+    </div>
+</body>
+</html>
+<script type="text/javascript">
+    
+    //指定图标的配置和数据
+    var option = {
+        title: {
+            text: ''
+        },
+        tooltip: {},
+        legend: {
+            data: ['案件数量']
+        },
+        xAxis: {
+            type: 'category',
+            data: []
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [{
+            name: '案件数量',
+            type: 'bar',
+            data: [
+
+            ]
+        }]
+    };
+    //初始化echarts实例
+    var myChart = echarts.init(document.getElementById('chartmain'));
+    var myChart2 = echarts.init(document.getElementById('chart'));
+    //使用制定的配置项和数据显示图表
+    myChart.setOption(option);
+    myChart2.setOption(option);
+
+    $.get('/Statistics/getxAxis?type=1', function (r) {
+        if (r) {
+            myChart.setOption({
+                xAxis: {
+                    data: r
+                }
+            })
+        }
+    });
+
+    $.get('/Statistics/getxAxis?type=2', function (r) {
+        if (r) {
+            myChart2.setOption({
+                xAxis: {
+                    data: r
+                }
+            })
+        }
+    })
+
+
+    $("#cc").combobox({
+        onChange: function (newValue, oldValue) {
+            var year = $("#cc").combobox('getValue');
+            var url = "/Statistics/getCounty?year=" + year;
+            var url2 = "/Statistics/getCategory?year=" + year;
+            $.get(url, function (r) {
+                if (r) {
+                    myChart.setOption({
+                        title: {
+                            text: '滨州市' + year + '年信访案件分布图'
+                        },
+                        series: [{
+                            data: r
+                        }]
+                    })
+                }
+            });
+
+            $.get(url2, function (r) {
+                if (r) {
+                    myChart2.setOption({
+                        title: {
+                            text: '滨州市' + year + '年信访渠道分布图'
+                        },
+                        series: [{
+                            data: r
+                        }]
+                    })
+                }
+            });
+        }
+    })
+</script>
+

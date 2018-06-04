@@ -1,0 +1,105 @@
+﻿
+@{
+    ViewBag.Title = "用户列表";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    $(function () {
+        $('#dg').datagrid({
+            url: '/Management/getUserList?foo=' + Math.random(),
+            onLoadSuccess: function (data) {
+                if (data.total < 1) {
+                    var body = $(this).data().datagrid.dc.body2;
+                    body.find('table tbody').append('<tr><td width="' + body.width() + '" style="height: 25px; text-align: center;" colspan="4" ><font color="gray" size="2">暂无用户！</font></td></tr>');
+                }
+            }
+        })
+    })
+
+    //function loadAll() {
+    //    $('#dg').datagrid({
+    //        url: '/Management/getUserList?foo=' + Math.random(),
+    //        onLoadSuccess: function (data) {
+    //            if (data.total < 1) {
+    //                var body = $(this).data().datagrid.dc.body2;
+    //                body.find('table tbody').append('<tr><td width="' + body.width() + '" style="height: 25px; text-align: center;" colspan="4" ><font color="gray" size="2">暂无用户！</font></td></tr>');
+    //            }
+    //        }
+    //    })
+    //}
+
+    function doSearch(value) {
+        $('#dg').datagrid({
+            url: '/Management/getUserList?foo=' + Math.random(),
+            queryParams: {
+                loginCode: value
+            },
+            onLoadSuccess: function (data) {
+                if (data.total < 1) {
+                    var body = $(this).data().datagrid.dc.body2;
+                    body.find('table tbody').append('<tr><td width="' + body.width() + '" style="height: 25px; text-align: center;" colspan="4" ><font color="gray" size="2">未找到搜索的用户</font></td></tr>');
+                }
+            }
+        })
+    }
+
+    function reset() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row) {
+            $.messager.confirm('提示', '确定要重置该用户的密码吗？', function (r) {
+                if (r) {
+                    $.post('/Management/ResetPassword', { UserId: row.Id }, function (result) {
+                        if (result.success) {
+                            $.messager.alert('提示', '密码已重置为123456');
+                        } else {
+                            $.messager.alert('提示', result.message);
+                        }
+                    })
+                }
+            })
+        } else {
+            $.messager.alert('提示', '请选择需要重置密码的用户!', 'error');
+        }
+    }
+
+    function remove() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row) {
+            $.messager.confirm('提示', '该用户所有的信息将被删除且不可被找回，您确定要删除吗？', function (r) {
+                if (r) {
+                    $.post('/Management/DeleteUserPost', { UserId: row.Id }, function (result) {
+                        if (result.success) {
+                            $.messager.alert('提示', '删除成功');
+                        } else {
+                            $.messager.alert('提示', result.message);
+                        }
+                    })
+                }
+            })
+        } else {
+            $.messager.alert('提示', '请选择要删除的用户!', 'error');
+        }
+    }
+</script>
+<div class="easyui-panel" title="用户列表" style="width:100%;height:100%;padding:10px">
+    <table class="easyui-datagrid" id="dg" style="width:100%;height:100%" pagination="true" rownumbers="true" singleSelect="true" toolbar="#toolbar">
+        <thead>
+            <tr>
+                <th width="100px" data-options="field:'LoginCode', align:'center'">用户名</th>
+                <th width="100px" data-options="field:'CountyName', align:'center'">所属县区</th>
+                <th width="100px" data-options="field:'Name', align:'center'">姓名</th>
+                <th width="100px" data-options="field:'Phone', align:'center'">联系电话</th>
+            </tr>
+        </thead>
+    </table>
+    <div id="toolbar" style="padding:5px;height:auto">
+        <div style="margin-bottom:5px">
+            <a href="#" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="reset()">重置密码</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="remove()">删除用户</a>
+        </div>
+        <div style="margin: 3px auto; height: 24px; line-height: 24px">
+            查询用户：
+            <input class="easyui-searchbox" data-options="prompt:'请输入用户名',searcher:doSearch" style="width:150px" />
+        </div>
+    </div>
+</div>

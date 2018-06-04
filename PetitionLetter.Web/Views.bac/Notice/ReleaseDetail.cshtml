@@ -1,0 +1,45 @@
+﻿@model PetitionLetter.Dll.Model.Notice
+@{
+    ViewBag.Title = "通知详情";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .biaoti {
+        margin-top: 40px;
+        font-size: 20px;
+        color: #002667;
+        border-bottom: 1px solid #d5d5d5;
+        padding-bottom: 20px;
+    }
+    .zzz {
+        font-size: 12px;
+        color: #7d7d7d;
+        margin: 17px 0 28px 0;
+    }
+    .content {
+        text-align: left;
+        margin-bottom: 50px;
+        overflow: hidden;
+    }
+    .wp_articlecontent {
+        font-size: 15px;
+        line-height: 20px;
+        color: #232425;
+    }
+</style>
+
+<div id="p" class="easyui-panel" title="通知详情" style="width:100%;height:100%;padding:30px 60px;text-align:center">
+    <h1 class="biaoti">@Model.Title</h1>
+    <div class="zzz">
+        <span style="margin-right:20px">发布单位：@Model.SenderName</span>
+        <span style="margin-right:20px">发布时间：@Model.CreateTimeString</span>
+    </div>
+    <div class="content">
+        <article>
+            <div class="wp_articlecontent">
+                @(new HtmlString(Model.Content))
+            </div>
+        </article>
+    </div>
+</div>
+

@@ -1,0 +1,37 @@
+﻿
+@{
+    ViewBag.Title = "预警信息";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    $(function () {
+        $('#dg').datagrid({
+            url: '/Warning/getList',
+            onLoadSuccess: function (data) {
+                if (data.total < 1) {
+                    var body = $(this).data().datagrid.dc.body2;
+                    body.find('table tbody').append('<tr><td width="' + body.width() + '" style="height: 25px; text-align: center;" colspan="3" ><font color="gray" size="2">暂无预警信息</font></td></tr>');
+                }
+            }
+        });
+    });
+
+    function urlFormatter(value, row, index) {
+        return '<a href="/Warning/Detail?warningId=' + value + '" target="_self">查看</a>';
+    }
+</script>
+
+<div class="easyui-panel" title="预警信息列表" style="width:100%;height:100%;padding:10px;">
+    <table class="easyui-datagrid" id="dg" style="width:100%;height:100%" pagination="true"
+           rownumbers="true" fitColumns="true" singleSelect="true">
+        <thead>
+            <tr>
+                <th data-options="field:'Uploader',width:100,align:'center'">上报者</th>
+                <th data-options="field:'Content',width:200,align:'center'">预警内容</th>
+                <th width="165" data-options="field:'Id',align:'center',formatter:urlFormatter">操作</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+

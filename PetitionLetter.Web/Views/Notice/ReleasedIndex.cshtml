@@ -1,0 +1,74 @@
+﻿
+@{
+    ViewBag.Title = "我发布的通知";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    $(function () {
+        $('#dg').datagrid({
+            url: '/Notice/getReleaseList',
+            onLoadSuccess: function (data) {
+                if (data.total < 1) {
+                    var body = $(this).data().datagrid.dc.body2;
+                    body.find('table tbody').append('<tr><td width="' + body.width() + '" style="height: 25px; text-align: center;" colspan="4" ><font color="gray" size="2">暂无我发布的通知！</font></td></tr>');
+                }
+            }
+        });
+    });
+
+    function urlFormatter(value, row, index) {
+        return '<a href="/Notice/ReleaseDetail?id=' + value + '" target="_self">查看</a>';
+    }
+
+    function readFormatter(value, row, index) {
+        return '<a href="/Notice/PeopleIndex?type=1&NoticeId=' + row.Id + '" target="_self" style="text-decoration:none">' + row.Read + '</a>' + '人已读/' + '<a href="/Notice/PeopleIndex?type=0&NoticeId=' + row.Id + '" target="_self" style="text-decoration:none">' + row.Unread + '</a>' + '人未读';
+    }
+
+    function doSearch() {
+        $('#dg').datagrid({
+            url: '/Notice/getReleaseList',
+            queryParams: {
+                StartTime: $('#StartTime').datebox('getValue'),
+                EndTime: $('#EndTime').datebox('getValue'),
+                KeyWord: $('#KeyWord').val()
+            },
+            onLoadSuccess: function (data) {
+                if (data.total < 1) {
+                    var body = $(this).data().datagrid.dc.body2;
+                    body.find('table tbody').append('<tr><td width="' + body.width() + '" style="height: 25px; text-align: center;" colspan="4" ><font color="gray" size="2">暂无我发布的通知！</font></td></tr>');
+                }
+            }
+        })
+    }
+</script>
+
+<div id="p" class="easyui-panel" title="我发布的通知" style="width:100%;height:100%;padding:10px;">
+    <table id="dg" class="easyui-datagrid" style="width:100%;height:100%"
+           toolbar="#toolbar" pagination="true"
+           rownumbers="true" fitColumns="true" singleSelect="true">
+        <thead>
+            <tr>
+                <th data-options="field:'Title',width:200,align:'center'">标题</th>
+                <th data-options="field:'CreateTimeString',width:100,align:'center'">发布时间</th>
+                <th data-options="field:'None',width:150,align:'center',formatter:readFormatter">查看情况</th>
+                <th width="165" data-options="field:'Id',align:'center',formatter:urlFormatter">操作</th>
+            </tr>
+        </thead>
+    </table>
+    <div id="toolbar" style="padding:5px;height:auto">
+        <div style="margin-bottom:5px;display:flex;height:25px">
+            <p style="margin:5px">开始日期:</p>
+            <input class="easyui-datebox" id="StartTime" data-options="sharedCalendar:'#cc'">
+            <div style="width:20px"></div>
+            <p style="margin:5px">结束日期:</p>
+            <input class="easyui-datebox" id="EndTime" data-options="sharedCalendar:'#cc'">
+            <div style="width:20px"></div>
+            <p style="margin:5px">关键字:</p>
+            <input class="easyui-textbox" id="KeyWord" data-options="prompt:'请输入关键字'" style="width:150px" />
+            <div style="width:20px"></div>
+            <a onclick="doSearch()" class="easyui-linkbutton" href="javascript:void(0)" iconCls="icon-search">查询</a>
+        </div>
+    </div>
+    <div id="cc" class="easyui-calendar"></div>
+</div>

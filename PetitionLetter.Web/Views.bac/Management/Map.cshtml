@@ -1,0 +1,162 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="utf-8"/>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css">
+        body, html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            font-family: "微软雅黑";
+        }
+        #allmap {
+            width: 100%;
+            height: calc(100% - 35px);
+            overflow: hidden;
+        }
+        #result {
+            width: 100%;
+            height: 30px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+    </style>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=AEA2vhIN0R1sbbRYBOeXnHiap3Z1iYcG"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+    <link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="~/EasyUI/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="~/EasyUI/locale/easyui-lang-zh_CN.js"></script>
+    <link rel="stylesheet" type="text/css" href="~/EasyUI/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="~/EasyUI/themes/icon.css">
+    <title>维护地图区划</title>
+</head>
+<body>
+    <div id="allmap" style="overflow:hidden;zoom:1;position:relative;">
+        <div id="map" style="height:100%;-webkit-transition: all 0.5s ease-in-out;transition: all 0.5s ease-in-out;"></div>
+    </div>
+    <div id="result">
+        <a href="#" class="easyui-linkbutton" style="width:100px" onclick="showDialog()">保存</a>
+        <a href="#" class="easyui-linkbutton" style="width:100px; margin-left:10px" onclick="clearAll()">清除</a>
+    </div>
+    <div id="dlg" class="easyui-dialog" title="选择乡镇" style="width:400px;height:150px;padding:10px;" closed="true" buttons="#dlg-buttons">
+        <div style="display:flex">
+            <div style="width:50%;display:flex;margin-top:10px;text-align:right">
+                <p style="margin-top:7px;font-size:14px">县区：</p>
+                <input id="county" class="easyui-combobox" style="height:30px;width:130px"
+                       data-options="valueField:'Id',textField:'Name',url:'/Management/GetCountyList',prompt:'请选择'">
+            </div>
+            <div style="width:50%;display:flex;margin-top:10px">
+                <p style="margin-top:7px;font-size:14px">乡镇：</p>
+                <input id="town" class="easyui-combobox" style="height:30px;width:130px"
+                       data-options="valueField:'Id',textField:'Name',prompt:'请选择'">
+            </div>
+        </div>
+    </div>
+    <div id="dlg-buttons" style="text-align: center">
+        <a href="javascript:void(0);" class="easyui-linkbutton c6" iconcls="icon-ok" onclick="save()">确定</a>
+        <a href="javascript:void(0);" class="easyui-linkbutton" iconcls="icon-cancel" onclick="$('#dlg').dialog('close')">取消</a>
+    </div>
+</body>
+</html>
+<script type="text/javascript">
+    var map = new BMap.Map('map');
+    map.centerAndZoom("滨州市", 12);
+    map.enableScrollWheelZoom(); //启用鼠标滚动对地图放大缩小
+    
+    //鼠标绘制完成回调方法   获取各个点的经纬度
+    var overlays = [];
+    var overlaycomplete = function (e) {
+        overlays.push(e.overlay);
+        var path = e.overlay.getPath();//Array<Point> 返回多边型的点数组
+        $('#dlg').dialog('open');
+        
+        //for (var i = 0; i < path.length; i++) {
+        //    console.log("lng:" + path[i].lng + "\n lat:" + path[i].lat);
+        //}
+    };
+    var styleOptions = {
+        strokeColor: "red",    //边线颜色。
+        fillColor: "red",      //填充颜色。当参数为空时，圆形将没有填充效果。
+        strokeWeight: 3,       //边线的宽度，以像素为单位。
+        strokeOpacity: 0.8,       //边线透明度，取值范围0 - 1。
+        fillOpacity: 0.6,      //填充的透明度，取值范围0 - 1。
+        strokeStyle: 'solid' //边线的样式，solid或dashed。
+    }
+    //实例化鼠标绘制工具
+    var drawingManager = new BMapLib.DrawingManager(map, {
+        isOpen: false, //是否开启绘制模式
+        enableDrawingTool: true, //是否显示工具栏
+        drawingMode: BMAP_DRAWING_POLYGON,//绘制模式  多边形
+        drawingToolOptions: {
+            anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
+            offset: new BMap.Size(5, 5), //偏离值
+            drawingModes: [
+                BMAP_DRAWING_POLYGON
+            ]
+        },
+        polygonOptions: styleOptions //多边形的样式
+    });
+
+    //添加鼠标绘制工具监听事件，用于获取绘制结果
+    drawingManager.addEventListener('overlaycomplete', overlaycomplete);
+
+    function clearAll() {
+        $.messager.confirm('提示', '确定要清除所选区域吗？', function (r) {
+            if (r) {
+                for (var i = 0; i < overlays.length; i++) {
+                    map.removeOverlay(overlays[i]);
+                }
+                overlays.length = 0
+            }
+        });        
+    }
+
+    function showDialog() {
+        $('#dlg').dialog('open');
+    }
+
+    function save() {
+        var town = $('#town').combobox('getValue');
+        if (town == null || town.length == 0) {
+            $.messager.alert('错误', '请选择乡镇');
+            return;
+        }
+        if (overlays.length == 0) {
+            $.messager.alert('错误', '请在地图中选出乡镇区划');
+            return;
+        } else if (overlays.length > 1) {
+            $.messager.alert('错误', '请勿选取多个乡镇区划');
+            return;
+        }
+
+        $.post("/Management/MapPost", { overlays: JSON.stringify(overlays[0].getPath()), countyId: town }, function (r) {
+            if (r.success) {
+                $.messager.alert('提示', '保存成功', 'info', function (r) {
+                    for (var i = 0; i < overlays.length; i++) {
+                        map.removeOverlay(overlays[i]);
+                    }
+                    overlays.length = 0
+                    $('#dlg').dialog('close');
+                });
+            }
+            else {
+                $.messager.alert('提示', r.message);
+            }
+        })
+    }
+
+    $('#county').combobox({
+        onSelect: function (rec) {
+            $('#town').combobox('clear');
+            $('#town').combobox('reload', '/Management/GetTown?county=' + rec.Id);
+        }
+    })
+</script>

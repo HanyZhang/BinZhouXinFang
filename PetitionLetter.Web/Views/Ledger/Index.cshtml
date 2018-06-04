@@ -1,0 +1,199 @@
+﻿
+@{
+    ViewBag.Title = "台账";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    $(function () {
+        $('#dg').datagrid({
+            url: '/Ledger/getList',
+            onLoadSuccess: function (data) {
+                if (data.total < 1) {
+                    var body = $(this).data().datagrid.dc.body2;
+                    body.find('table tbody').append('<tr><td width="' + body.width() + '" style="height: 25px; text-align: center;" colspan="10" ><font color="gray" size="2">暂无记录！</font></td></tr>');
+                }
+            }
+        });
+    });
+
+    function add() {
+        $('#fm').form('clear');
+        $('#dlg').dialog('open');
+    }
+
+    function edit() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row) {
+            var leaders = row.LeaderStr.split(",");
+            var directors = row.DirectorStr.split(",");
+            if (leaders.length != 3 && directors.length != 3) {
+                $.messager.alert('提示', '解析错误');
+                return;
+            }
+            $('#fm').form('load', row);
+            $('#LeaderName').textbox('setValue', leaders[0]);
+            $('#LeaderDuty').textbox('setValue', leaders[1]);
+            $('#LeaderPhone').textbox('setValue', leaders[2]);
+            $('#DirectorName').textbox('setValue', directors[0]);
+            $('#DirectorDuty').textbox('setValue', directors[1]);
+            $('#DirectorPhone').textbox('setValue', directors[2]);
+            $('#dlg').dialog('open');
+        } else {
+            $.messager.alert('提示', '请选择一条数据！');
+        }
+    }
+
+    function remove() {
+        //$.messager.alert('prompt', 'remove');
+        var row = $('#dg').datagrid('getSelected');
+        if (row) {
+            $.messager.confirm('提示', '确定要删除本条记录吗？', function (r) {
+                if (r) {
+                    $.post('/Ledger/deletePost', { ledgerId: row.Id }, function (r) {
+                        if (r.success) {
+                            $.messager.alert('提示', '删除成功', 'info', function (r) {
+                                $('#dg').datagrid('reload');
+                            })
+                        } else {
+                            $.messager.alert('提示', r.message);
+                        }
+                    })
+                }
+            })
+        } else {
+            $.messager.alert('提示', '请选择一条数据！');
+        }
+    }
+
+    //function doSearch() {
+
+    //}
+
+    //function loadAll() {
+    //    $('#dg').datagrid({
+    //        url: '/Notice/getReceiveList'
+    //    });
+    //}
+
+    function submit() {
+        var Leader = { Name: $('#LeaderName').val(), Duty: $('#LeaderDuty').val(), Phone: $('#LeaderPhone').val(), Type: 1 };
+        var Director = { Name: $('#DirectorName').val(), Duty: $('#DirectorDuty').val(), Phone: $('#DirectorPhone').val(), Type: 2 };
+        Leader = JSON.stringify(Leader);
+        Director = JSON.stringify(Director);
+        $('#LeaderStr').val(Leader);
+        $('#DirectorStr').val(Director);
+        $('#fm').form('submit', {
+            url: '/Ledger/CreatePost',
+            type: 'post',            
+            success: function (r) {
+                if (r == null) return; 
+                r = $.parseJSON(r);
+                if (r.success) {
+                    $('#dlg').dialog('close');
+                    $('#dg').datagrid('reload');
+                } else {
+                    $.messager.alert('提示', r.message);
+                }
+            }
+        })
+    }
+
+</script>
+
+<div class="easyui-panel" title="台账" style="width:100%;height:100%;padding:10px;">
+    <table class="easyui-datagrid" id="dg" style="width:99%;height:100%" pagination="true"
+           rownumbers="true" singleSelect="true" toolbar="#toolbar">
+        <thead>
+            <tr>
+                <th width="100px" data-options="field:'DateString',align:'center'">信访日期</th>
+                <th width="100px" data-options="field:'Name',align:'center'">姓名</th>
+                <th width="150px" data-options="field:'Address',align:'center'">地址</th>
+                <th width="50px" data-options="field:'Count',align:'center'">人数</th>
+                <th width="200px" data-options="field:'Survey',align:'center'">概况</th>
+                <th width="150px" data-options="field:'Reply',align:'center'">办理答复情况</th>
+                <th width="150px" data-options="field:'StabilityControl',align:'center'">稳控情况</th>
+                <th width="400px" data-options="field:'LeaderStr',align:'center'">包家领导姓名，职务，联系电话</th>
+                <th width="400px" data-options="field:'DirectorStr',align:'center'">稳控具体负责人姓名，职务，联系电话</th>
+                <th width="200px" data-options="field:'Remark',align:'center'">备注</th>
+            </tr>
+        </thead>
+    </table>
+    <div id="toolbar" style="padding:5px;height:auto">
+        <div style="margin-bottom:5px">
+            <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="add()">添加</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="edit()">编辑</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="remove()">删除</a>
+        </div>
+        @*<div id="search-form" style="margin: 3px auto; height: 24px; line-height: 24px">
+            查询标题：
+            <input class="easyui-searchbox" data-options="prompt:'请输入标题',searcher:doSearch" style="width:150px" />
+            <a onclick="loadAll()" class="easyui-linkbutton" href="javascript:void(0)" iconCls="icon-search">查询所有</a>
+        </div>*@
+    </div>
+
+    <div id="dlg" class="easyui-dialog" title="添加记录" closed="true" buttons="#dlg-buttons" style="width:500px;height:400px;padding:30px 70px 50px 70px">
+        <form id="fm" method="post">
+            <div style="margin-bottom:10px">
+                <div>信访日期:</div>
+                <input class="easyui-datebox" name="PetitionDate" data-options="sharedCalendar:'#cc'" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>姓名:</div>
+                <input class="easyui-textbox" name="Name" style="width:100%" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>地址:</div>
+                <input class="easyui-textbox" name="Address" style="width:100%" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>人数:</div>
+                <input class="easyui-numberbox" name="Count" style="width:100%" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>概况:</div>
+                <input class="easyui-textbox" name="Survey" data-options="multiline:true" style="width:100%;height:80px" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>办理答复情况:</div>
+                <input class="easyui-textbox" name="Reply" style="width:100%" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>稳控情况:</div>
+                <input class="easyui-textbox" name="StabilityControl" data-options="multiline:true" style="width:100%;height:50px" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>包家领导姓名、职务、联系电话:</div>
+                <div style="display:flex">
+                    <input id="LeaderName" class="easyui-textbox" style="width:60px" data-options="prompt:'姓名'" required>
+                    <div style="width:10px"></div>
+                    <input id="LeaderDuty" class="easyui-textbox" style="width:150px" data-options="prompt:'职务'" required>
+                    <div style="width:10px"></div>
+                    <input id="LeaderPhone" class="easyui-textbox" style="width:100px" data-options="prompt:'联系电话'" required>
+                </div>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>稳控具体负责人姓名、职务、联系电话:</div>
+                <div style="display:flex">
+                    <input id="DirectorName" class="easyui-textbox" style="width:60px" data-options="prompt:'姓名'" required>
+                    <div style="width:10px"></div>
+                    <input id="DirectorDuty" class="easyui-textbox" style="width:150px" data-options="prompt:'职务'" required>
+                    <div style="width:10px"></div>
+                    <input id="DirectorPhone" class="easyui-textbox" style="width:100px" data-options="prompt:'联系电话'" required>
+                </div>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>备注:</div>
+                <input class="easyui-textbox" name="Remark" style="width:100%">
+            </div>
+            <input name="Id" hidden="hidden">
+            <input id="LeaderStr" name="LeaderStr" hidden="hidden">
+            <input id="DirectorStr" name="DirectorStr" hidden="hidden">
+        </form>
+    </div>
+
+    <div id="dlg-buttons" style="text-align: right">
+        <a href="javascript:void(0);" class="easyui-linkbutton c6" iconcls="icon-ok" onclick="submit()">确定</a>
+        <a href="javascript:void(0);" class="easyui-linkbutton" iconcls="icon-cancel" onclick="$('#dlg').dialog('close')">取消</a>
+    </div>
+    <div id="cc" class="easyui-calendar"></div>
+</div>

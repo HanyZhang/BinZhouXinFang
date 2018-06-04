@@ -1,0 +1,124 @@
+﻿@model PetitionLetter.Dll.Model.Warning
+@{
+    ViewBag.Title = "预警信息";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    .inimg {
+        width: 100%;
+        height: 395px;
+        white-space: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+    .inimg img {
+        width: 500px;
+        height: 375px;
+    }
+</style>
+
+<script type="text/javascript">
+    function instruction() {
+        $('#title').text('批示内容:');
+        $('#dlg').dialog({ title: '批示' });
+        $('#Status').val('1');
+        $('#dlg').dialog('open');
+    }
+
+    function transfer() {
+        $('#title').text('转交部门:');
+        $('#dlg').dialog({ title: '转送交办' });
+        $('#Status').val('3');
+        $('#dlg').dialog('open');
+    }
+
+    function report() {
+        $.messager.confirm('提示', '确定要上报给上一级吗？', function (r) {
+            if (r) {
+                $.post('/Warning/WarningFlowPost', { Status: 2, WarningId: @Model.Id, Description: '已上报给上一级' }, function (r) {
+                    if (r) {
+                        $.messager.alert('提示', '已上报给上一级。');
+                        $('#buttons').hide();
+                    } else {
+                        $.messager.alert('提示', r.message);
+                    }
+                })
+            }
+        })
+    }
+
+    function submit() {
+        $('#WarningId').val(@Model.Id);
+        $('#fm').form('submit', {
+            url: '/Warning/WarningFlowPost',
+            type: 'post',
+            success: function (r) {
+                if (r == null) return;
+                r = $.parseJSON(r);
+                if (r.success) {
+                    $('#dlg').dialog('close');
+                    $('#buttons').hide();
+                } else {
+                    $.messager.alert('提示', r.message);
+                }
+            }
+        })
+    }
+
+</script>
+
+<div class="easyui-panel" style="width:100%;height:100%;padding:10px;overflow:auto" title="预警信息">
+    <div style="margin-bottom:20px">
+        <p>文字内容:</p>
+        <div style="margin-left:30px">@Model.Content</div>
+    </div>
+    <div style="margin-bottom:20px">
+        <p>图片内容:</p>
+        <div class="inimg">
+            @if (string.IsNullOrEmpty(Model.Image))
+            {
+                <div style="margin-left:30px">无图片内容。</div>
+            }
+            else
+            {
+                foreach (var item in ViewData["ImageList"] as List<String>)
+                {
+                    <img src="~/Upload/@item" alt="img"/>
+                }
+            }
+        </div>
+    </div>
+    <div style="margin-bottom:20px">
+        <p>视频内容:</p>
+        <div>
+            <video width="320" height="240" controls="controls" autoplay="autoplay">
+                <source src="~/Upload/@Model.Video" type="video/mp4" />
+            </video>
+        </div>
+    </div>
+    <div style="margin-bottom:20px;display:flex" id="buttons">
+        <a href="#" class="easyui-linkbutton" onclick="instruction()" style="margin-right:30px">批示</a>
+        <a href="#" class="easyui-linkbutton" onclick="transfer()" style="margin-right:30px">转送交办</a>
+        <a href="#" class="easyui-linkbutton" onclick="report()" style="margin-right:30px">上报上一级</a>
+    </div>
+    <div class="easyui-dialog" id="dlg" closed="true" style="width:500px;height:240px;padding:20px 50px 10px 50px" buttons="#dlg-buttons">
+        <form id="fm" method="post">
+            <div style="margin-bottom:10px">
+                <p id="title"></p>
+                <input class="easyui-textbox" name="Description" data-options="multiline:true" style="width:100%;height:80px;" required>
+                <input hidden="hidden" id="Status" name="Status">
+                <input hidden="hidden" id="WarningId" name="WarningId">
+            </div>
+        </form>
+    </div>
+    @*<div class="easyui-dialog" id="dlg" title="转送交办" closed="true" style="width:500px;height:300px;padding:20px 50px 10px 50px" buttons="#dlg-buttons">
+        <div style="margin-bottom:10px">
+            <div>转送部门:</div>
+            <input class="easyui-textbox" name="Department" style="width:100%" required>
+        </div>
+    </div>*@
+    <div id="dlg-buttons" style="text-align:right">
+        <a href="javascript:void(0);" class="easyui-linkbutton c6" iconcls="icon-ok" onclick="submit()">确定</a>
+        <a href="javascript:void(0);" class="easyui-linkbutton" iconcls="icon-cancel" onclick="$('#dlg').dialog('close')">取消</a>
+    </div>
+</div>

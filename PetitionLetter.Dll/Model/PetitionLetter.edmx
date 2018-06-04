@@ -1,0 +1,831 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="PetitionLetterModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="County">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="ParentId" Type="nvarchar" MaxLength="12" />
+          <Property Name="Id" Type="nvarchar" MaxLength="12" Nullable="false" />
+          <Property Name="Level" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="30" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Ledger">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PetitionDate" Type="date" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Address" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Count" Type="int" Nullable="false" />
+          <Property Name="Survey" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Reply" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="StabilityControl" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Remark" Type="nvarchar" MaxLength="200" />
+          <Property Name="CountyId" Type="nvarchar" MaxLength="12" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LedgerLeader">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LedgerId" Type="int" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Duty" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Phone" Type="nvarchar" MaxLength="15" Nullable="false" />
+          <Property Name="Type" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Notice">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Sender" Type="int" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="Content" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="NoticeReceiver">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="NoticeId" Type="int" Nullable="false" />
+          <Property Name="Receiver" Type="int" Nullable="false" />
+          <Property Name="ReadTime" Type="datetime" />
+          <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Petition">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="PetitionDate" Type="date" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Phone" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Certificate" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Address" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="ProblemAddress" Type="nvarchar" MaxLength="12" Nullable="false" />
+          <Property Name="Count" Type="int" Nullable="false" />
+          <Property Name="Survey" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Remark" Type="nvarchar" MaxLength="500" />
+          <Property Name="CategoryId" Type="int" Nullable="false" />
+          <Property Name="Channel" Type="int" Nullable="false" />
+          <Property Name="VisitType" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TownCoordinate">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CountyId" Type="nvarchar" MaxLength="12" Nullable="false" />
+          <Property Name="Coordinate" Type="nvarchar(max)" Nullable="false" />
+        </EntityType>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="LoginCode" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="Password" Type="nvarchar" MaxLength="32" Nullable="false" />
+          <Property Name="Role" Type="int" Nullable="false" />
+          <Property Name="CountyId" Type="nvarchar" MaxLength="12" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="10" />
+          <Property Name="Phone" Type="nvarchar" MaxLength="20" />
+        </EntityType>
+        <EntityType Name="Warning">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="Content" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Image" Type="nvarchar" MaxLength="500" />
+          <Property Name="Video" Type="nvarchar" MaxLength="500" />
+          <Property Name="ReportTime" Type="datetime" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="WarningFlow">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="WarningId" Type="int" Nullable="false" />
+          <Property Name="Time" Type="datetime" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="Status" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Country_TownCoordinate">
+          <End Role="County" Type="Self.County" Multiplicity="1" />
+          <End Role="TownCoordinate" Type="Self.TownCoordinate" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="County">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="TownCoordinate">
+              <PropertyRef Name="CountyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_County">
+          <End Role="County" Type="Self.County" Multiplicity="1" />
+          <End Role="User" Type="Self.User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="County">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="User">
+              <PropertyRef Name="CountyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Ledger_County">
+          <End Role="County" Type="Self.County" Multiplicity="1" />
+          <End Role="Ledger" Type="Self.Ledger" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="County">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Ledger">
+              <PropertyRef Name="CountyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LedgerLeader">
+          <End Role="Ledger" Type="Self.Ledger" Multiplicity="1" />
+          <End Role="LedgerLeader" Type="Self.LedgerLeader" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ledger">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LedgerLeader">
+              <PropertyRef Name="LedgerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Notice">
+          <End Role="Notice" Type="Self.Notice" Multiplicity="1" />
+          <End Role="NoticeReceiver" Type="Self.NoticeReceiver" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Notice">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="NoticeReceiver">
+              <PropertyRef Name="NoticeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Notice_Receiver">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="NoticeReceiver" Type="Self.NoticeReceiver" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="NoticeReceiver">
+              <PropertyRef Name="Receiver" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Notice_Sender">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="Notice" Type="Self.Notice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Notice">
+              <PropertyRef Name="Sender" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Petition_Category">
+          <End Role="Category" Type="Self.Category" Multiplicity="1" />
+          <End Role="Petition" Type="Self.Petition" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Petition">
+              <PropertyRef Name="CategoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Petition_County">
+          <End Role="County" Type="Self.County" Multiplicity="1" />
+          <End Role="Petition" Type="Self.Petition" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="County">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Petition">
+              <PropertyRef Name="ProblemAddress" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_User">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="Warning" Type="Self.Warning" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Warning">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_WarningFlow_User">
+          <End Role="User" Type="Self.User" Multiplicity="1" />
+          <End Role="WarningFlow" Type="Self.WarningFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="WarningFlow">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_WarningFlow_Warning">
+          <End Role="Warning" Type="Self.Warning" Multiplicity="1" />
+          <End Role="WarningFlow" Type="Self.WarningFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Warning">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="WarningFlow">
+              <PropertyRef Name="WarningId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="PetitionLetterModelStoreContainer">
+          <EntitySet Name="Category" EntityType="Self.Category" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="County" EntityType="Self.County" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Ledger" EntityType="Self.Ledger" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LedgerLeader" EntityType="Self.LedgerLeader" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Notice" EntityType="Self.Notice" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="NoticeReceiver" EntityType="Self.NoticeReceiver" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Petition" EntityType="Self.Petition" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TownCoordinate" EntityType="Self.TownCoordinate" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="User" EntityType="Self.User" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Warning" EntityType="Self.Warning" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="WarningFlow" EntityType="Self.WarningFlow" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Country_TownCoordinate" Association="Self.FK_Country_TownCoordinate">
+            <End Role="County" EntitySet="County" />
+            <End Role="TownCoordinate" EntitySet="TownCoordinate" />
+          </AssociationSet>
+          <AssociationSet Name="FK_County" Association="Self.FK_County">
+            <End Role="County" EntitySet="County" />
+            <End Role="User" EntitySet="User" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Ledger_County" Association="Self.FK_Ledger_County">
+            <End Role="County" EntitySet="County" />
+            <End Role="Ledger" EntitySet="Ledger" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LedgerLeader" Association="Self.FK_LedgerLeader">
+            <End Role="Ledger" EntitySet="Ledger" />
+            <End Role="LedgerLeader" EntitySet="LedgerLeader" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Notice" Association="Self.FK_Notice">
+            <End Role="Notice" EntitySet="Notice" />
+            <End Role="NoticeReceiver" EntitySet="NoticeReceiver" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Notice_Receiver" Association="Self.FK_Notice_Receiver">
+            <End Role="User" EntitySet="User" />
+            <End Role="NoticeReceiver" EntitySet="NoticeReceiver" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Notice_Sender" Association="Self.FK_Notice_Sender">
+            <End Role="User" EntitySet="User" />
+            <End Role="Notice" EntitySet="Notice" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Petition_Category" Association="Self.FK_Petition_Category">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="Petition" EntitySet="Petition" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Petition_County" Association="Self.FK_Petition_County">
+            <End Role="County" EntitySet="County" />
+            <End Role="Petition" EntitySet="Petition" />
+          </AssociationSet>
+          <AssociationSet Name="FK_User" Association="Self.FK_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Warning" EntitySet="Warning" />
+          </AssociationSet>
+          <AssociationSet Name="FK_WarningFlow_User" Association="Self.FK_WarningFlow_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="WarningFlow" EntitySet="WarningFlow" />
+          </AssociationSet>
+          <AssociationSet Name="FK_WarningFlow_Warning" Association="Self.FK_WarningFlow_Warning">
+            <End Role="Warning" EntitySet="Warning" />
+            <End Role="WarningFlow" EntitySet="WarningFlow" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="PetitionLetterModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Category">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Notice">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Sender" Type="Int32" Nullable="false" />
+          <Property Name="Title" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Content" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityContainer Name="PetitionLetterEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Category" EntityType="Self.Category" />
+          <EntitySet Name="Notice" EntityType="Self.Notice" />
+          <EntitySet Name="User" EntityType="PetitionLetterModel.User" />
+          <AssociationSet Name="FK_Notice_Sender" Association="PetitionLetterModel.FK_Notice_Sender">
+            <End Role="User" EntitySet="User" />
+            <End Role="Notice" EntitySet="Notice" />
+          </AssociationSet>
+          <EntitySet Name="County" EntityType="PetitionLetterModel.County" />
+          <AssociationSet Name="FK_County" Association="PetitionLetterModel.FK_County">
+            <End Role="County" EntitySet="County" />
+            <End Role="User" EntitySet="User" />
+          </AssociationSet>
+          <EntitySet Name="NoticeReceiver" EntityType="PetitionLetterModel.NoticeReceiver" />
+          <AssociationSet Name="FK_Notice" Association="PetitionLetterModel.FK_Notice">
+            <End Role="Notice" EntitySet="Notice" />
+            <End Role="NoticeReceiver" EntitySet="NoticeReceiver" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Notice_Receiver" Association="PetitionLetterModel.FK_Notice_Receiver">
+            <End Role="User" EntitySet="User" />
+            <End Role="NoticeReceiver" EntitySet="NoticeReceiver" />
+          </AssociationSet>
+          <EntitySet Name="Warning" EntityType="PetitionLetterModel.Warning" />
+          <AssociationSet Name="FK_User" Association="PetitionLetterModel.FK_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="Warning" EntitySet="Warning" />
+          </AssociationSet>
+          <EntitySet Name="TownCoordinate" EntityType="PetitionLetterModel.TownCoordinate" />
+          <AssociationSet Name="FK_Country_TownCoordinate" Association="PetitionLetterModel.FK_Country_TownCoordinate">
+            <End Role="County" EntitySet="County" />
+            <End Role="TownCoordinate" EntitySet="TownCoordinate" />
+          </AssociationSet>
+          <EntitySet Name="Ledger" EntityType="PetitionLetterModel.Ledger" />
+          <EntitySet Name="LedgerLeader" EntityType="PetitionLetterModel.LedgerLeader" />
+          <AssociationSet Name="FK_Ledger_County" Association="PetitionLetterModel.FK_Ledger_County">
+            <End Role="County" EntitySet="County" />
+            <End Role="Ledger" EntitySet="Ledger" />
+          </AssociationSet>
+          <AssociationSet Name="FK_LedgerLeader" Association="PetitionLetterModel.FK_LedgerLeader">
+            <End Role="Ledger" EntitySet="Ledger" />
+            <End Role="LedgerLeader" EntitySet="LedgerLeader" />
+          </AssociationSet>
+          <EntitySet Name="Petition" EntityType="PetitionLetterModel.Petition" />
+          <AssociationSet Name="FK_Petition_Category" Association="PetitionLetterModel.FK_Petition_Category">
+            <End Role="Category" EntitySet="Category" />
+            <End Role="Petition" EntitySet="Petition" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Petition_County" Association="PetitionLetterModel.FK_Petition_County">
+            <End Role="County" EntitySet="County" />
+            <End Role="Petition" EntitySet="Petition" />
+          </AssociationSet>
+          <EntitySet Name="WarningFlow" EntityType="PetitionLetterModel.WarningFlow" />
+          <AssociationSet Name="FK_WarningFlow_User" Association="PetitionLetterModel.FK_WarningFlow_User">
+            <End Role="User" EntitySet="User" />
+            <End Role="WarningFlow" EntitySet="WarningFlow" />
+          </AssociationSet>
+          <AssociationSet Name="FK_WarningFlow_Warning" Association="PetitionLetterModel.FK_WarningFlow_Warning">
+            <End Role="Warning" EntitySet="Warning" />
+            <End Role="WarningFlow" EntitySet="WarningFlow" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LoginCode" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Password" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="true" />
+          <Property Name="Role" Type="Int32" Nullable="false" />
+          <Property Name="CountyId" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="Name" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="Phone" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK_Notice_Sender">
+          <End Type="PetitionLetterModel.User" Role="User" Multiplicity="1" />
+          <End Type="PetitionLetterModel.Notice" Role="Notice" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Notice">
+              <PropertyRef Name="Sender" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="County">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="ParentId" Type="String" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="Id" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="Level" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK_County">
+          <End Type="PetitionLetterModel.County" Role="County" Multiplicity="1" />
+          <End Type="PetitionLetterModel.User" Role="User" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="County">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="User">
+              <PropertyRef Name="CountyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="NoticeReceiver">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="NoticeId" Type="Int32" Nullable="false" />
+          <Property Name="Receiver" Type="Int32" Nullable="false" />
+          <Property Name="ReadTime" Type="DateTime" Precision="3" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Notice">
+          <End Type="PetitionLetterModel.Notice" Role="Notice" Multiplicity="1" />
+          <End Type="PetitionLetterModel.NoticeReceiver" Role="NoticeReceiver" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Notice">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="NoticeReceiver">
+              <PropertyRef Name="NoticeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Notice_Receiver">
+          <End Type="PetitionLetterModel.User" Role="User" Multiplicity="1" />
+          <End Type="PetitionLetterModel.NoticeReceiver" Role="NoticeReceiver" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="NoticeReceiver">
+              <PropertyRef Name="Receiver" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Warning">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="Content" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Image" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="Video" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="ReportTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_User">
+          <End Type="PetitionLetterModel.User" Role="User" Multiplicity="1" />
+          <End Type="PetitionLetterModel.Warning" Role="Warning" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Warning">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="TownCoordinate">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CountyId" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="Coordinate" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK_Country_TownCoordinate">
+          <End Type="PetitionLetterModel.County" Role="County" Multiplicity="1" />
+          <End Type="PetitionLetterModel.TownCoordinate" Role="TownCoordinate" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="County">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="TownCoordinate">
+              <PropertyRef Name="CountyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Ledger">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Address" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Count" Type="Int32" Nullable="false" />
+          <Property Name="Survey" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Reply" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="StabilityControl" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Remark" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="CountyId" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="PetitionDate" Type="DateTime" Nullable="false" Precision="0" />
+        </EntityType>
+        <EntityType Name="LedgerLeader">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="LedgerId" Type="Int32" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Duty" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="Phone" Type="String" Nullable="false" MaxLength="15" FixedLength="false" Unicode="true" />
+          <Property Name="Type" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Ledger_County">
+          <End Type="PetitionLetterModel.County" Role="County" Multiplicity="1" />
+          <End Type="PetitionLetterModel.Ledger" Role="Ledger" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="County">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Ledger">
+              <PropertyRef Name="CountyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_LedgerLeader">
+          <End Type="PetitionLetterModel.Ledger" Role="Ledger" Multiplicity="1" />
+          <End Type="PetitionLetterModel.LedgerLeader" Role="LedgerLeader" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ledger">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="LedgerLeader">
+              <PropertyRef Name="LedgerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Petition">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PetitionDate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Phone" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Certificate" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Address" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="ProblemAddress" Type="String" Nullable="false" MaxLength="12" FixedLength="false" Unicode="true" />
+          <Property Name="Count" Type="Int32" Nullable="false" />
+          <Property Name="Survey" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Remark" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="CategoryId" Type="Int32" Nullable="false" />
+          <Property Name="Channel" Type="Int32" Nullable="false" />
+          <Property Name="VisitType" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Petition_Category">
+          <End Type="PetitionLetterModel.Category" Role="Category" Multiplicity="1" />
+          <End Type="PetitionLetterModel.Petition" Role="Petition" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Category">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Petition">
+              <PropertyRef Name="CategoryId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Petition_County">
+          <End Type="PetitionLetterModel.County" Role="County" Multiplicity="1" />
+          <End Type="PetitionLetterModel.Petition" Role="Petition" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="County">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Petition">
+              <PropertyRef Name="ProblemAddress" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="WarningFlow">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="WarningId" Type="Int32" Nullable="false" />
+          <Property Name="Time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_WarningFlow_User">
+          <End Type="PetitionLetterModel.User" Role="User" Multiplicity="1" />
+          <End Type="PetitionLetterModel.WarningFlow" Role="WarningFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="User">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="WarningFlow">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_WarningFlow_Warning">
+          <End Type="PetitionLetterModel.Warning" Role="Warning" Multiplicity="1" />
+          <End Type="PetitionLetterModel.WarningFlow" Role="WarningFlow" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Warning">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="WarningFlow">
+              <PropertyRef Name="WarningId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="PetitionLetterModelStoreContainer" CdmEntityContainer="PetitionLetterEntities">
+          <EntitySetMapping Name="Category">
+            <EntityTypeMapping TypeName="PetitionLetterModel.Category">
+              <MappingFragment StoreEntitySet="Category">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Notice">
+            <EntityTypeMapping TypeName="PetitionLetterModel.Notice">
+              <MappingFragment StoreEntitySet="Notice">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Sender" ColumnName="Sender" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="CreateTime" ColumnName="CreateTime" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="User">
+            <EntityTypeMapping TypeName="PetitionLetterModel.User">
+              <MappingFragment StoreEntitySet="User">
+                <ScalarProperty Name="Phone" ColumnName="Phone" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="CountyId" ColumnName="CountyId" />
+                <ScalarProperty Name="Role" ColumnName="Role" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="LoginCode" ColumnName="LoginCode" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="County">
+            <EntityTypeMapping TypeName="PetitionLetterModel.County">
+              <MappingFragment StoreEntitySet="County">
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Level" ColumnName="Level" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="NoticeReceiver">
+            <EntityTypeMapping TypeName="PetitionLetterModel.NoticeReceiver">
+              <MappingFragment StoreEntitySet="NoticeReceiver">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ReadTime" ColumnName="ReadTime" />
+                <ScalarProperty Name="Receiver" ColumnName="Receiver" />
+                <ScalarProperty Name="NoticeId" ColumnName="NoticeId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Warning">
+            <EntityTypeMapping TypeName="PetitionLetterModel.Warning">
+              <MappingFragment StoreEntitySet="Warning">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="ReportTime" ColumnName="ReportTime" />
+                <ScalarProperty Name="Video" ColumnName="Video" />
+                <ScalarProperty Name="Image" ColumnName="Image" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TownCoordinate">
+            <EntityTypeMapping TypeName="PetitionLetterModel.TownCoordinate">
+              <MappingFragment StoreEntitySet="TownCoordinate">
+                <ScalarProperty Name="Coordinate" ColumnName="Coordinate" />
+                <ScalarProperty Name="CountyId" ColumnName="CountyId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Ledger">
+            <EntityTypeMapping TypeName="PetitionLetterModel.Ledger">
+              <MappingFragment StoreEntitySet="Ledger">
+                <ScalarProperty Name="PetitionDate" ColumnName="PetitionDate" />
+                <ScalarProperty Name="CountyId" ColumnName="CountyId" />
+                <ScalarProperty Name="Remark" ColumnName="Remark" />
+                <ScalarProperty Name="StabilityControl" ColumnName="StabilityControl" />
+                <ScalarProperty Name="Reply" ColumnName="Reply" />
+                <ScalarProperty Name="Survey" ColumnName="Survey" />
+                <ScalarProperty Name="Count" ColumnName="Count" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LedgerLeader">
+            <EntityTypeMapping TypeName="PetitionLetterModel.LedgerLeader">
+              <MappingFragment StoreEntitySet="LedgerLeader">
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Phone" ColumnName="Phone" />
+                <ScalarProperty Name="Duty" ColumnName="Duty" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="LedgerId" ColumnName="LedgerId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Petition">
+            <EntityTypeMapping TypeName="PetitionLetterModel.Petition">
+              <MappingFragment StoreEntitySet="Petition">
+                <ScalarProperty Name="VisitType" ColumnName="VisitType" />
+                <ScalarProperty Name="Channel" ColumnName="Channel" />
+                <ScalarProperty Name="CategoryId" ColumnName="CategoryId" />
+                <ScalarProperty Name="Remark" ColumnName="Remark" />
+                <ScalarProperty Name="Survey" ColumnName="Survey" />
+                <ScalarProperty Name="Count" ColumnName="Count" />
+                <ScalarProperty Name="ProblemAddress" ColumnName="ProblemAddress" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="Certificate" ColumnName="Certificate" />
+                <ScalarProperty Name="Phone" ColumnName="Phone" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="PetitionDate" ColumnName="PetitionDate" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="WarningFlow">
+            <EntityTypeMapping TypeName="PetitionLetterModel.WarningFlow">
+              <MappingFragment StoreEntitySet="WarningFlow">
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Time" ColumnName="Time" />
+                <ScalarProperty Name="WarningId" ColumnName="WarningId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

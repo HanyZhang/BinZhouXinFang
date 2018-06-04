@@ -1,0 +1,50 @@
+﻿
+@{
+    ViewBag.Title = "填写日报";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script type="text/javascript">
+    $(function () {
+        $('#dg').datagrid({
+            url: '/Petition/getDailyList'
+        })
+    })
+
+    function dateFormatter(value, row, index) {
+        return row.PetitionDate + " (" + row.DayOfWeek + ")";
+    }
+
+    function statusFormatter(value, row, index) {
+        if (row.Status == 0) {
+            return "未报";
+        } else if (row.Status == 1) {
+            return "已报";
+        } else {
+            return "未知";
+        }
+    }
+    
+    function operateFormatter(value, row, index) {
+        if (row.Status == 0) {
+            return '<a href="/Petition/Create?Date=' + row.PetitionDate + '" target="_self">填报</a>';
+        } else if (row.Status == 1) {
+            return '<a href="/Petition/Create?Date=' + row.PetitionDate + '" target="_self">查看</a>';
+        } else {
+            return '未知';
+        }
+    }
+</script>
+
+<div class="easyui-panel" title="日报列表" style="width:100%;height:100%;padding:10px">
+    <table class="easyui-datagrid" id="dg" style="width:99%;height:100%" pagination="false"
+           rownumbers="true" fitColumns="true" singleSelect="true" toolbar="#toolbar">
+        <thead>
+            <tr>
+                <th data-options="field:'Date',width:100,align:'center',formatter:dateFormatter">日期</th>
+                <th data-options="field:'Status', width:100,align:'center',formatter:statusFormatter">填报状态</th>
+                <th data-options="field:'Operate', width:100,align:'center',formatter:operateFormatter">操作</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+

@@ -1,0 +1,160 @@
+﻿
+@{
+    ViewBag.Title = "来市、到省、进京走访日报表" + "(" + ViewBag.Date + ")";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript">
+    $(function () {
+        var date = "@ViewBag.Date";
+        $('#dg').datagrid({
+            url: '/Petition/getDailyPetitionList',
+            queryParams: {
+                date: date
+            },
+            onLoadSuccess: function (data) {
+                if (data.total < 1) {
+                    var body = $(this).data().datagrid.dc.body2;
+                    body.find('table tbody').append('<tr><td width="' + body.width() + '" style="height: 25px; text-align: center;" colspan="9" ><font color="gray" size="2">暂无记录！</font></td></tr>');
+                }
+            }
+        })
+    })
+
+    function add() {
+        $('#fm').form('clear');
+        $('#PetitionDate').datebox('setValue', '@ViewBag.Date');
+        $('#dlg').dialog('open');
+    }
+
+    function edit() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row) {
+            $('#fm').form('load', row);
+            $('#dlg').dialog('open');
+        } else {
+            $.messager.alert('提示', '请选择一条数据!');
+        }
+    }
+
+    function remove() {
+        var row = $('#dg').datagrid('getSelected');
+        if (row) {
+            $.messager.confirm('提示', '确定要删除本条记录吗？', function (r) {
+                if (r) {
+                    $.post('/Petition/deletePost', { PetitionId: row.Id }, function (r) {
+                        if (r.success) {
+                            $.messager.alert('提示', '删除成功', 'info', function (r) {
+                                $('#dg').datagrid('reload');
+                            })
+                        } else {
+                            $.messager.alert('提示', r.message);
+                        }
+                    })
+                }
+            })
+        } else {
+            $.messager.alert('提示', '请选择一条数据!');
+        }
+    }
+
+    function submit() {
+        $('#fm').form('submit', {
+            url: '/Petition/createPost',
+            type: 'post',
+            success: function (r) {
+                if (r == null) return;
+                r = $.parseJSON(r);
+                if (r.success) {
+                    $('#dlg').dialog('close');
+                    $('#dg').datagrid('reload');
+                } else {
+                    $.messager.alert('提示', r.message);
+                }
+            }
+        })
+    }
+</script>
+
+<div class="easyui-panel" title=@ViewBag.Title style="width:100%;height:100%;padding:10px">
+    <table class="easyui-datagrid" id="dg" style="width:99%;height:100%" pagination="true"
+           rownumbers="true" singleSelect="true" toolbar="#toolbar">
+        <thead>
+            <tr>
+                <th width="100px" data-options="field:'DateString', align:'center'">信访日期</th>
+                <th width="100px" data-options="field:'Name', align:'center'">姓名</th>
+                <th width="100px" data-options="field:'Phone', align:'center'">联系电话</th>
+                <th width="150px" data-options="field:'Certificate', align:'center'">证件号码</th>
+                <th width="200px" data-options="field:'Address', align:'center'">地址</th>
+                <th width="50px" data-options="field:'Count', align:'center'">人数</th>
+                <th width="300px" data-options="field:'Survey', align:'center'">概况</th>
+                <th width="80px" data-options="field:'VisitString', align:'center'">走访方式</th>
+                <th width="150px" data-options="field:'Remark', align:'center'">备注</th>
+            </tr>
+        </thead>
+    </table>
+    <div id="toolbar" style="padding:5px;height:auto">
+        <div style="margin-bottom:5px;display:flex;height:25px">
+            <a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="add()">添加</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="edit()">编辑</a>
+            <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="remove()">删除</a>
+        </div>
+    </div>
+    <div id="dlg" class="easyui-dialog" title="添加日报记录" closed="true" buttons="#dlg-buttons" style="width:500px;height:400px;padding:30px 70px 50px 70px">
+        <form id="fm" method="post">
+            <div style="margin-bottom:10px">
+                <div>信访日期:</div>
+                <input class="easyui-datebox" id="PetitionDate" name="PetitionDate" data-options="sharedCalendar:'#cc'" readonly>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>信访渠道:</div>
+                <input name="Channel" class="easyui-combobox" style="height:25px;width:200px"
+                       data-options="valueField:'Id',textField:'Name',url:'/Management/GetChannelList',prompt:'请选择'" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>信访类别:</div>
+                <input name="CategoryId" class="easyui-combobox" style="height:25px;width:200px"
+                       data-options="valueField:'Id',textField:'Name',url:'/Management/GetCategorySelect',prompt:'请选择'" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>姓名:</div>
+                <input class="easyui-textbox" name="Name" style="width:100%" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>联系电话:</div>
+                <input class="easyui-textbox" name="Phone" style="width:100%" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>证件号码:</div>
+                <input class="easyui-textbox" name="Certificate" style="width:100%" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>地址:</div>
+                <input class="easyui-textbox" name="Address" style="width:100%" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>人数:</div>
+                <input class="easyui-numberbox" name="Count" style="width:100%" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>概况:</div>
+                <input class="easyui-textbox" name="Survey" data-options="multiline:true" style="width:100%;height:80px" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>走访方式:</div>
+                <input name="VisitType" class="easyui-combobox" style="height:25px;width:200px"
+                       data-options="valueField:'Id',textField:'Name',url:'/Management/GetVisitList',prompt:'请选择'" required>
+            </div>
+            <div style="margin-bottom:10px">
+                <div>备注:</div>
+                <input class="easyui-textbox" name="Remark" style="width:100%">
+            </div>
+            <input name="Id" hidden="hidden">
+        </form>
+    </div>
+    <div id="dlg-buttons" style="text-align: right">
+        <a href="javascript:void(0);" class="easyui-linkbutton c6" iconcls="icon-ok" onclick="submit()">确定</a>
+        <a href="javascript:void(0);" class="easyui-linkbutton" iconcls="icon-cancel" onclick="$('#dlg').dialog('close')">取消</a>
+    </div>
+    <div id="cc" class="easyui-calendar"></div>
+</div>
