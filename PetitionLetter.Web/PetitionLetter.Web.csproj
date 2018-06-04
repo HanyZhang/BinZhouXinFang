@@ -1120,13 +1120,13 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\XinFangAndroid\XinFangAndroid\XinFangAndroid.csproj">
-      <Project>{3bc0ac7e-3b3b-4d3f-9cc0-b2bdecc460a6}</Project>
-      <Name>XinFangAndroid</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PetitionLetter.Dll\PetitionLetter.Dll.csproj">
       <Project>{57380D9A-40D4-439C-971C-6913AF96E04D}</Project>
       <Name>PetitionLetter.Dll</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XinFangAndroid\XinFangAndroid.csproj">
+      <Project>{3bc0ac7e-3b3b-4d3f-9cc0-b2bdecc460a6}</Project>
+      <Name>XinFangAndroid</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

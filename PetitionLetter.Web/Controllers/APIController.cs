@@ -103,7 +103,7 @@ namespace PetitionLetter.Web.Controllers
             MyJsonResult result = new MyJsonResult();
             result.success = true;
             result.data = list;
-            return Json(result.data);
+            return Json(result);
         }
     }
 }

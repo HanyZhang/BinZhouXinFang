@@ -151,11 +151,5 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\XinFangAndroid\XinFangAndroid\XinFangAndroid.csproj">
-      <Project>{3bc0ac7e-3b3b-4d3f-9cc0-b2bdecc460a6}</Project>
-      <Name>XinFangAndroid</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
